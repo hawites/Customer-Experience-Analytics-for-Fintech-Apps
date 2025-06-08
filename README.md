@@ -23,8 +23,11 @@ BankReviewAnalysis/
 │   ├── __init__.py
 │   ├── scraper.py          # Google Play review scraping
 │   ├── preprocess.py       # Cleaning module
+│   ├── sentiment.py       # sentiment
 ├── tests/                  # Unit tests
-│   └── test_preprocessor.py
+│   ├── test_preprocessor.py
+│   ├── test_scaper.py       
+│   ├── run_tests.py       
 ├── README.md               # Project documentation
 └── requirements.txt        # Package dependencies
 ```
