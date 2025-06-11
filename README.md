@@ -1,12 +1,13 @@
+
 # 🏦 Customer Experience Analytics for Fintech Apps
 
 ## 📌 Project Overview
 
 This project simulates the role of a Data Analyst at Omega Consultancy. It focuses on analyzing customer satisfaction with three major Ethiopian banks' mobile apps:
 
-* Commercial Bank of Ethiopia (CBE)
-* Bank of Abyssinia (BOA)
-* Dashen Bank (DB)
+- Commercial Bank of Ethiopia (CBE)
+- Bank of Abyssinia (BOA)
+- Dashen Bank (DB)
 
 The goal is to scrape, clean, analyze, and visualize app review data from the Google Play Store.
 
@@ -15,21 +16,39 @@ The goal is to scrape, clean, analyze, and visualize app review data from the Go
 ## 📁 Folder Structure
 
 ```
-BankReviewAnalysis/
-├── data/                   # Raw and cleaned datasets
-├── notebooks/              # Jupyter notebooks per task
-│   └── Scraping_Insights.ipynb
-├── src/                    # Core modules
+Customer-Experience-Analytics-for-Fintech-Apps/
+├── data/                          # Raw, cleaned, and labeled review data
+│   ├── *_reviews.csv
+│   ├── sentiment_themes_labeled.csv
+│   └── clean/
+│       ├── cleaned_*.csv
+│
+├── notebooks/                    # Jupyter notebooks 
+│   ├── Scraping_Insights.ipynb
+│   └── Sentiment_Thematic_Analysis.ipynb
+│
+├── src/                          # Core logic modules
+│   ├── scraper.py                # Task 1 - Scraping logic
+│   ├── preprocess.py             # Task 1 - Data cleaning
+│   ├── sentiment.py              # Task 2 - Sentiment interface (BERT/VADER)
+│   ├── sentiment_model.py        # Task 2 - Actual model implementation
 │   ├── __init__.py
-│   ├── scraper.py          # Google Play review scraping
-│   ├── preprocess.py       # Cleaning module
-│   ├── sentiment.py       # sentiment
-├── tests/                  # Unit tests
-│   ├── test_preprocessor.py
-│   ├── test_scaper.py       
-│   ├── run_tests.py       
-├── README.md               # Project documentation
-└── requirements.txt        # Package dependencies
+│   └── utils/                    # Task 2 - Supporting components
+│       ├── keyword_extractor.py     # Extract keywords from review text
+│       ├── text_utils.py            # Tokenization, filtering utilities
+│       ├── theme_grouper.py         # Rule-based theme classification
+│       └── aggregator.py            # Bank-wise sentiment aggregations
+│
+├── tests/                        # Unit tests for all modules
+│   ├── test_keyword_extractor.py
+│   ├── test_preprocess.py
+│   ├── test_scraper.py
+│   ├── test_sentiment.py
+│   ├── test_theme_grouper.py
+│   └── run_tests.py              # CLI runner for all tests
+│
+├── requirements.txt              # All package dependencies
+└── README.md                     # Project documentation
 ```
 
 ---
@@ -38,43 +57,60 @@ BankReviewAnalysis/
 
 ### 🕷️ Step 1: Scrape Reviews
 
-**Location:** `src/scraper.py`
-
- used `google-play-scraper` to scrape 600 reviews per app.
-
+**Location:** `src/scraper.py`  
+Used `google-play-scraper` to scrape 600 reviews per app.
 
 ### 🧹 Step 2: Preprocess Data
 
-**Location:** `src/preprocess.py`
+**Location:** `src/preprocess.py`  
+Handles:
+- Removing duplicates
+- Dropping missing values
+- Normalizing date formats
+- Filtering non-English reviews
+- Renaming and standardizing columns
 
-The `PreProcessData` class handles:
-
-* Removing duplicates
-* Dropping missing values
-* Normalizing date formats
-* Filtering out non-English reviews (Amharic/Afaan Oromo)
-* Renaming and standardizing columns
-
-Example usage:
-
+Example:
 ```python
 from src.preprocess import PreProcessData
 
-pp = PreProcessData("../data/boa_reviews.csv")
+pp = PreProcessData("data/cbe_reviews.csv")
 pp.load_data()
 pp.clean()
-pp.save_cleaned("../data/boa_cleaned.csv")
+pp.save_cleaned("data/clean/cleaned_cbe_reviews.csv")
 ```
 
-### 🧪 Step 3: Test
+### 🧪 Step 3: Run Tests
 
-Test scripts are provided in the `tests/` folder to verify cleaning logic.
+Run `python tests/run_tests.py` to test modules.
 
 ---
 
-## 📦 Requirements
+## 📊 Task 2: Sentiment & Thematic Analysis
 
-Install dependencies:
+### 🧠 Sentiment Analysis
+**Location:** `src/sentiment.py` + `sentiment_model.py`  
+Uses:
+- DistilBERT (HuggingFace)
+- VADER (for comparison)
+
+### 🧵 Thematic Analysis
+**Location:** `src/utils/`  
+Components:
+- `keyword_extractor.py`: TF-IDF & spaCy extraction
+- `theme_grouper.py`: Rule-based grouping into 3–5 business themes
+- `aggregator.py`: Summary stats by bank
+
+### 📒 Notebook Execution
+
+Main analysis notebook:
+- `notebooks/Sentiment_Thematic_Analysis.ipynb`
+
+---
+
+## 📦 Setup & Requirements
+
+Install all dependencies using:
 
 ```bash
 pip install -r requirements.txt
@@ -82,10 +118,7 @@ pip install -r requirements.txt
 
 ---
 
-## 📈 Next Step
+## 🚀 Outputs
 
-Proceed to **Task 2**: Sentiment and Thematic Analysis
-
-> Make sure all cleaned files are stored in `data/` before continuing.
-
----
+- Sentiment & themes labeled: `data/sentiment_themes_labeled.csv`
+- Analysis artifacts in `notebooks/`
