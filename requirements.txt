@@ -3,3 +3,8 @@ jupyter
 pandas
 transformers
 vaderSentiment
+scikit-learn
+numpy
+torch
+spacy
+hf_xet
