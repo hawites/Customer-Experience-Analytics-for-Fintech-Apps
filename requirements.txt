@@ -1,3 +1,5 @@
 google-play-scraper
 jupyter
 pandas
+transformers
+vaderSentiment
