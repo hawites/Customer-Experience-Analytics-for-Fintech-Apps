@@ -26,7 +26,7 @@ Customer-Experience-Analytics-for-Fintech-Apps/
 ├── notebooks/                    # Jupyter notebooks 
 │   ├── Scraping_Insights.ipynb
 │   ├── Sentiment_Thematic_Analysis.ipynb
-│   └── Upload_to_Oracle.ipynb
+│   └── Upload_to_Database.ipynb
 │
 ├── src/                          # Core logic modules
 │   ├── scraper.py                # Task 1 - Scraping logic
@@ -52,8 +52,8 @@ Customer-Experience-Analytics-for-Fintech-Apps/
 │   ├── test_database.py
 │   └── run_tests.py              # CLI runner
 │
-├── sql/                          # SQL dump of populated tables
-│   └── bank_reviews_dump.sql
+├── db/                          # SQL dump of populated tables
+│   └── bank_reviews.sql
 │
 ├── .env                          # Oracle DB connection (excluded from Git)
 ├── requirements.txt              # All dependencies
@@ -134,7 +134,7 @@ Two main tables created:
 ### 📥 Data Upload
 **Files:**
 - `src/utils/db_config.py`: Loads DB credentials from `.env`
-- `src/utils/database.py`: Class-based uploader
+- `src/database.py`: Class-based uploader
 
 ### 💻 Sample Usage:
 ```python
@@ -149,7 +149,7 @@ uploader.close()
 
 ### 📒 Notebook
 Executed in:  
-`notebooks/Upload_to_Oracle.ipynb`
+`notebooks/Upload_to_Database.ipynb`
 
 ### 📤 SQL Dump
 Exported `banks` and `reviews` tables:  
@@ -179,5 +179,5 @@ You also need:
 ## ✅ Outputs
 
 - `data/sentiment_themes_labeled.csv`: Sentiment + theme-labeled data
-- `sql/bank_reviews_dump.sql`: Oracle-ready SQL dump
+- `db/bank_reviews.sql`: Oracle-ready SQL dump
 - Uploaded data into Oracle XE via Python
