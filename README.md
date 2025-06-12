@@ -1,4 +1,3 @@
-
 # 🏦 Customer Experience Analytics for Fintech Apps
 
 ## 📌 Project Overview
@@ -9,7 +8,7 @@ This project simulates the role of a Data Analyst at Omega Consultancy. It focus
 - Bank of Abyssinia (BOA)
 - Dashen Bank (DB)
 
-The goal is to scrape, clean, analyze, and visualize app review data from the Google Play Store.
+The goal is to scrape, clean, analyze, visualize, and store app review data from the Google Play Store.
 
 ---
 
@@ -26,14 +25,16 @@ Customer-Experience-Analytics-for-Fintech-Apps/
 ├── notebooks/                    # Jupyter notebooks 
 │   ├── Scraping_Insights.ipynb
 │   ├── Sentiment_Thematic_Analysis.ipynb
-│   └── Upload_to_Oracle.ipynb
+│   ├── Upload_to_Database.ipynb
+│   └── Insights_and_Recommendations.ipynb
 │
 ├── src/                          # Core logic modules
 │   ├── scraper.py                # Task 1 - Scraping logic
 │   ├── preprocess.py             # Task 1 - Data cleaning
 │   ├── sentiment.py              # Task 2 - Sentiment interface (BERT/VADER)
 │   ├── sentiment_model.py        # Task 2 - Actual model implementation
-│   ├── database.py              # Task 3 - Insert banks/reviews into Oracle
+│   ├── database.py               # Task 3 - Oracle DB insertion
+│   ├── insight_analyzer.py       # Task 4 - Insights, plots, drivers/pain points
 │   ├── __init__.py
 │   └── utils/
 │       ├── keyword_extractor.py     # TF-IDF / spaCy keyword extraction
@@ -42,18 +43,18 @@ Customer-Experience-Analytics-for-Fintech-Apps/
 │       ├── aggregator.py            # Sentiment aggregations
 │       ├── db_config.py             # Task 3 - Loads Oracle DB credentials
 │       
-│
 ├── tests/                        # Unit tests for all modules
 │   ├── test_keyword_extractor.py
 │   ├── test_preprocess.py
 │   ├── test_scraper.py
 │   ├── test_sentiment.py
 │   ├── test_theme_grouper.py
+│   ├── test_insight_analyzer.py
 │   ├── test_database.py
 │   └── run_tests.py              # CLI runner
 │
-├── sql/                          # SQL dump of populated tables
-│   └── bank_reviews_dump.sql
+├── db/                          # SQL dump of populated tables
+│   └── bank_reviews.sql
 │
 ├── .env                          # Oracle DB connection (excluded from Git)
 ├── requirements.txt              # All dependencies
@@ -134,7 +135,7 @@ Two main tables created:
 ### 📥 Data Upload
 **Files:**
 - `src/utils/db_config.py`: Loads DB credentials from `.env`
-- `src/utils/database.py`: Class-based uploader
+- `src/database.py`: Class-based uploader
 
 ### 💻 Sample Usage:
 ```python
@@ -149,11 +150,44 @@ uploader.close()
 
 ### 📒 Notebook
 Executed in:  
-`notebooks/Upload_to_Oracle.ipynb`
+`notebooks/Upload_to_Database.ipynb`
 
 ### 📤 SQL Dump
 Exported `banks` and `reviews` tables:  
 `db/bank_reviews.sql`
+
+---
+
+## 📈 Task 4: Insights & Recommendations
+
+### 🔍 Insights
+**File:** `src/insight_analyzer.py`
+
+- Identified key **drivers** (e.g., "fast login", "easy navigation") and **pain points** (e.g., "crashes", "slow transactions").
+- Compared sentiment and themes across banks (CBE, BOA, DB).
+- Summarized findings per bank.
+
+### 📊 Visualizations
+Created using `matplotlib` and `seaborn`:
+- Sentiment distribution by bank
+- Average BERT score by rating
+- Theme frequency per bank
+- WordClouds of customer feedback
+- Theme ratios
+
+All visualizations are embedded in:  
+📒 `notebooks/Insights_and_Recommendations.ipynb`
+
+### 🧠 Recommendations
+- Add multi-language support
+- Improve crash handling
+- Optimize login speed
+- Provide better error messages
+- Add budgeting or notification features
+
+### ⚖️ Ethical Note
+- Acknowledge review bias (users more likely to post negative experiences)
+- Consider time-based or feature-based feedback grouping in future
 
 ---
 
@@ -179,5 +213,6 @@ You also need:
 ## ✅ Outputs
 
 - `data/sentiment_themes_labeled.csv`: Sentiment + theme-labeled data
-- `sql/bank_reviews_dump.sql`: Oracle-ready SQL dump
-- Uploaded data into Oracle XE via Python
+- `db/bank_reviews.sql`: Oracle-ready SQL dump
+- Uploaded data into Oracle XE
+- Plots & Insights: `notebooks/Insights_and_Recommendations.ipynb`
