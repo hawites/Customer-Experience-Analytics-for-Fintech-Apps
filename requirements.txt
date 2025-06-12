@@ -8,3 +8,5 @@ numpy
 torch
 spacy
 hf_xet
+cx_Oracle
+dotenv

@@ -25,19 +25,23 @@ Customer-Experience-Analytics-for-Fintech-Apps/
 │
 ├── notebooks/                    # Jupyter notebooks 
 │   ├── Scraping_Insights.ipynb
-│   └── Sentiment_Thematic_Analysis.ipynb
+│   ├── Sentiment_Thematic_Analysis.ipynb
+│   └── Upload_to_Oracle.ipynb
 │
 ├── src/                          # Core logic modules
 │   ├── scraper.py                # Task 1 - Scraping logic
 │   ├── preprocess.py             # Task 1 - Data cleaning
 │   ├── sentiment.py              # Task 2 - Sentiment interface (BERT/VADER)
 │   ├── sentiment_model.py        # Task 2 - Actual model implementation
+│   ├── database.py              # Task 3 - Insert banks/reviews into Oracle
 │   ├── __init__.py
-│   └── utils/                    # Task 2 - Supporting components
-│       ├── keyword_extractor.py     # Extract keywords from review text
-│       ├── text_utils.py            # Tokenization, filtering utilities
+│   └── utils/
+│       ├── keyword_extractor.py     # TF-IDF / spaCy keyword extraction
+│       ├── text_utils.py            # Tokenization, filtering
 │       ├── theme_grouper.py         # Rule-based theme classification
-│       └── aggregator.py            # Bank-wise sentiment aggregations
+│       ├── aggregator.py            # Sentiment aggregations
+│       ├── db_config.py             # Task 3 - Loads Oracle DB credentials
+│       
 │
 ├── tests/                        # Unit tests for all modules
 │   ├── test_keyword_extractor.py
@@ -45,9 +49,14 @@ Customer-Experience-Analytics-for-Fintech-Apps/
 │   ├── test_scraper.py
 │   ├── test_sentiment.py
 │   ├── test_theme_grouper.py
-│   └── run_tests.py              # CLI runner for all tests
+│   ├── test_database.py
+│   └── run_tests.py              # CLI runner
 │
-├── requirements.txt              # All package dependencies
+├── sql/                          # SQL dump of populated tables
+│   └── bank_reviews_dump.sql
+│
+├── .env                          # Oracle DB connection (excluded from Git)
+├── requirements.txt              # All dependencies
 └── README.md                     # Project documentation
 ```
 
@@ -58,19 +67,17 @@ Customer-Experience-Analytics-for-Fintech-Apps/
 ### 🕷️ Step 1: Scrape Reviews
 
 **Location:** `src/scraper.py`  
-Used `google-play-scraper` to scrape 600 reviews per app.
+Used `google-play-scraper` to collect reviews per app.
 
 ### 🧹 Step 2: Preprocess Data
 
 **Location:** `src/preprocess.py`  
-Handles:
-- Removing duplicates
-- Dropping missing values
-- Normalizing date formats
-- Filtering non-English reviews
-- Renaming and standardizing columns
+Functions:
+- Remove duplicates
+- Normalize dates
+- Drop missing/non-English rows
+- Rename and clean columns
 
-Example:
 ```python
 from src.preprocess import PreProcessData
 
@@ -80,45 +87,97 @@ pp.clean()
 pp.save_cleaned("data/clean/cleaned_cbe_reviews.csv")
 ```
 
-### 🧪 Step 3: Run Tests
-
-Run `python tests/run_tests.py` to test modules.
-
 ---
 
 ## 📊 Task 2: Sentiment & Thematic Analysis
 
 ### 🧠 Sentiment Analysis
-**Location:** `src/sentiment.py` + `sentiment_model.py`  
-Uses:
-- DistilBERT (HuggingFace)
-- VADER (for comparison)
+**Files:** `src/sentiment.py`, `src/sentiment_model.py`  
+Implements:
+- DistilBERT from HuggingFace Transformers
+- VADER (lexicon-based)
 
-### 🧵 Thematic Analysis
-**Location:** `src/utils/`  
-Components:
-- `keyword_extractor.py`: TF-IDF & spaCy extraction
-- `theme_grouper.py`: Rule-based grouping into 3–5 business themes
-- `aggregator.py`: Summary stats by bank
+### 📌 Thematic Analysis
+**Files:** `src/utils/theme_grouper.py`, `keyword_extractor.py`  
+Extracts keywords (TF-IDF/spaCy), and classifies themes:
+- Account Access Issues
+- Transaction Performance
+- UI/UX Feedback
+- Customer Support
+- Feature Requests
 
-### 📒 Notebook Execution
+### 📊 Aggregation
+Bank-wise and rating-wise aggregation done via `aggregator.py`
 
-Main analysis notebook:
-- `notebooks/Sentiment_Thematic_Analysis.ipynb`
+### 📒 Notebook
+Executed in:  
+`notebooks/Sentiment_Thematic_Analysis.ipynb`  
+Final result:  
+`data/sentiment_themes_labeled.csv`
 
 ---
 
-## 📦 Setup & Requirements
+## 🗃️ Task 3: Oracle Database Integration
 
-Install all dependencies using:
+### 🏛️ Objective:
+Simulate enterprise-level data warehousing by storing cleaned and processed review data in an Oracle XE database.
+
+### ⚙️ Oracle Setup
+- Used Oracle XE (Express Edition)
+- Connected via `cx_Oracle` and credentials stored in `.env`
+
+### 🧱 Schema
+Two main tables created:
+- `banks (bank_id PK, bank_name)`
+- `reviews (review_id PK, review_text, rating, date, sentiment_label, sentiment_score, theme, bank_id FK)`
+
+### 📥 Data Upload
+**Files:**
+- `src/utils/db_config.py`: Loads DB credentials from `.env`
+- `src/utils/database.py`: Class-based uploader
+
+### 💻 Sample Usage:
+```python
+from src.utils.database import OracleUploader
+
+uploader = OracleUploader()
+uploader.connect()
+uploader.insert_banks(csv)
+uploader.insert_reviews_from_csv(csv)
+uploader.close()
+```
+
+### 📒 Notebook
+Executed in:  
+`notebooks/Upload_to_Oracle.ipynb`
+
+### 📤 SQL Dump
+Exported `banks` and `reviews` tables:  
+`db/bank_reviews.sql`
+
+---
+
+## 📦 Setup & Installation
 
 ```bash
 pip install -r requirements.txt
 ```
 
+You also need:
+- Oracle Instant Client
+- `.env` file with:
+  ```
+  ORACLE_USERNAME=your_user
+  ORACLE_PASSWORD=your_pass
+  ORACLE_HOST=localhost
+  ORACLE_PORT=1521
+  ORACLE_SID=XE
+  ```
+
 ---
 
-## 🚀 Outputs
+## ✅ Outputs
 
-- Sentiment & themes labeled: `data/sentiment_themes_labeled.csv`
-- Analysis artifacts in `notebooks/`
+- `data/sentiment_themes_labeled.csv`: Sentiment + theme-labeled data
+- `sql/bank_reviews_dump.sql`: Oracle-ready SQL dump
+- Uploaded data into Oracle XE via Python
